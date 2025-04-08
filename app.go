@@ -33,6 +33,10 @@ func (a *App) ShowWindow() {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 	
+	// Position window properly below menu bar before showing it
+	positionWindowBelowMenuBar(a.ctx)
+	
+	// Show window
 	runtime.WindowShow(a.ctx)
 	runtime.WindowSetAlwaysOnTop(a.ctx, true)
 	a.isWindowVisible = true

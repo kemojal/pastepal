@@ -100,17 +100,39 @@ func setupKeyboardShortcuts(ctx context.Context) {
 
 // positionWindowBelowMenuBar positions the window below the menu bar
 func positionWindowBelowMenuBar(ctx context.Context) {
-	// Get screen size
-	screenWidth, _ := wailsRuntime.ScreenGetAll(ctx)
-	if len(screenWidth) > 0 {
-		primaryScreen := screenWidth[0]
+	// Get screen size and information
+	screens, _ := wailsRuntime.ScreenGetAll(ctx)
+	if len(screens) > 0 {
+		// Use primary screen by default
+		primaryScreen := screens[0]
 		
-		// Position at top right of screen, just below menu bar
-		menuBarHeight := 22 // Standard macOS menu bar height
-		x := primaryScreen.Width - 350 - 20 // 20 pixels from right edge
-		y := menuBarHeight + 5 // 5 pixels below menu bar
+		// Standard macOS menu bar height
+		menuBarHeight := 22
 		
-		wailsRuntime.WindowSetPosition(ctx, x, y)
+		// Get current position of window
+		x, y := wailsRuntime.WindowGetPosition(ctx)
+		
+		// Get window width
+		width, _ := wailsRuntime.WindowGetSize(ctx)
+		
+		// Position at top right of primary screen, just below menu bar
+		// Adjust for window width to align the right edge of the window with the right edge of the screen
+		newX := primaryScreen.Width - width - 20 // 20 pixels from right edge
+		newY := menuBarHeight + 5 // 5 pixels below menu bar
+
+		// Handle multi-monitor setups (check if x,y is already set and valid)
+		if x > 0 && y > 0 {
+			// If we already have a valid position, just adjust the Y coordinate
+			// to be below the menu bar, keeping the current X coordinate
+			newY = menuBarHeight + 5
+		}
+		
+		// Set the new position
+		wailsRuntime.WindowSetPosition(ctx, newX, newY)
+		
+		// Make window visible and bring to front
+		wailsRuntime.WindowShow(ctx) // Ensure window is visible
+		wailsRuntime.WindowSetAlwaysOnTop(ctx, true) // Keep on top
 	}
 }
 
