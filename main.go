@@ -61,6 +61,9 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			appContext = ctx // Save context for menu callbacks
 			app.startup(ctx)
+			
+			// Set up keyboard shortcuts
+			setupKeyboardShortcuts(ctx)
 		},
 		OnDomReady: func(ctx context.Context) {
 			// Show temporary notification that app is running
@@ -69,6 +72,9 @@ func main() {
 				Title:   "PastePal",
 				Message: "PastePal is running.\nUse the keyboard shortcut Ctrl+Alt+P to show/hide the window.",
 			})
+			
+			// Position window near the menu bar
+			positionWindowBelowMenuBar(ctx)
 		},
 		Menu: appMenu, // Set application menu
 		Mac:  macOptions,
@@ -79,6 +85,32 @@ func main() {
 
 	if err != nil {
 		println("Error:", err.Error())
+	}
+}
+
+// setupKeyboardShortcuts registers global keyboard shortcuts
+func setupKeyboardShortcuts(ctx context.Context) {
+	// Register keyboard shortcuts through the frontend to avoid runtime registration issues
+	wailsRuntime.EventsOn(ctx, "toggleWindow", func(optionalData ...interface{}) {
+		if appInstance != nil {
+			appInstance.ToggleWindowVisibility()
+		}
+	})
+}
+
+// positionWindowBelowMenuBar positions the window below the menu bar
+func positionWindowBelowMenuBar(ctx context.Context) {
+	// Get screen size
+	screenWidth, _ := wailsRuntime.ScreenGetAll(ctx)
+	if len(screenWidth) > 0 {
+		primaryScreen := screenWidth[0]
+		
+		// Position at top right of screen, just below menu bar
+		menuBarHeight := 22 // Standard macOS menu bar height
+		x := primaryScreen.Width - 350 - 20 // 20 pixels from right edge
+		y := menuBarHeight + 5 // 5 pixels below menu bar
+		
+		wailsRuntime.WindowSetPosition(ctx, x, y)
 	}
 }
 
