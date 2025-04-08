@@ -5,3 +5,19 @@
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
+
+export function HideWindow() {
+  return window['go']['main']['App']['HideWindow']();
+}
+
+export function IsWindowVisible() {
+  return window['go']['main']['App']['IsWindowVisible']();
+}
+
+export function ShowWindow() {
+  return window['go']['main']['App']['ShowWindow']();
+}
+
+export function ToggleWindowVisibility() {
+  return window['go']['main']['App']['ToggleWindowVisibility']();
+}
